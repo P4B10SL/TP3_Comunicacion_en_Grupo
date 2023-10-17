@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.*;
 
+
 public class SistemaComunicaciones {
     String ipDestino;
     public void SistComunicaciones()
@@ -140,4 +141,104 @@ public class SistemaComunicaciones {
         }
         return confirmacion;
     }
+
+    private static ExecutorService executorService = Executors.newFixedThreadPool(10);
+    public static String ReceiveTCP2() {
+        ServerSocket serverSocket;
+        PrintStream data_out_conex;
+        DataInputStream data_in_consola;
+        DataInputStream texto_console;
+        String confirmacion;
+        try {
+            String portString = "8080";
+            Integer port = Integer.parseInt(portString);
+            serverSocket = new ServerSocket(port);
+
+            // Bucle para aceptar conexiones entrantes
+            while (true) {
+                // Acepta una conexión entrante
+                Socket clientSocket = serverSocket.accept();
+
+                // Agrega la conexión al pool de sockets
+                executorService.submit(() -> {
+                    // Procesa la conexión
+                    BufferedReader input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                    System.out.println(input.readLine());
+                    PrintWriter output = new PrintWriter(clientSocket.getOutputStream(), true);
+                    // Lectura del input del cliente y se lo envia devuelta como output
+                    String line;
+                    while ((line = input.readLine()) != null) {
+                        output.println(line);
+                    }
+
+                    // Cierre del socket cliente
+                    clientSocket.close();
+                });
+            }
+        } catch (IOException e) {
+            System.out.println(e);
+            confirmacion = "ERROR" + e.toString();
+        }
+
+        // El método ReceiveTCP() ya no devuelve nada, ya que las conexiones se manejan en el pool de sockets
+        return null;
+    }
+
+
+    public void joinGroup(InetAddress grupo) throws IOException {
+        // Crea un socket multicast
+        MulticastSocket socket = new MulticastSocket(grupo.getPort());
+
+        // Se une al grupo multicast
+        socket.joinGroup(grupo);
+
+        // Cierra el socket
+        socket.close();
+    }
+
+    public void sendMulticast(String mensaje, InetAddress grupo) throws IOException {
+
+        // Crea un socket multicast
+        MulticastSocket socket = new MulticastSocket(grupo.getPort());
+
+        // Crea un paquete de datos multicast
+        DatagramPacket paquete = new DatagramPacket(mensaje.getBytes(), mensaje.length(), grupo, grupo.getPort());
+
+        // Envía el paquete de datos
+        socket.send(paquete);
+
+        // Cierra el socket
+        socket.close();
+    }
+
+    public void sendToCoordinator(String mensaje) throws IOException {
+        // Crea un socket TCP
+        Socket socket = new Socket("localhost", 8080);
+
+        // Crea un flujo de salida para el socket
+        PrintStream data_out_socket = new PrintStream(socket.getOutputStream());
+
+        // Envia el mensaje al socket
+        data_out_socket.println(mensaje);
+
+        // Cierra el socket
+        socket.close();
+    }
+
+    public String receiveFromCoordinator() throws IOException {
+        // Crea un socket TCP
+        Socket socket = new Socket("localhost", 8080);
+
+        // Crea un flujo de entrada para el socket
+        DataInputStream data_in_socket = new DataInputStream(socket.getInputStream());
+
+        // Obtiene el mensaje del socket
+        String mensaje = data_in_socket.readLine();
+
+        // Cierra el socket
+        socket.close();
+
+        return mensaje;
+    }
+
 }
