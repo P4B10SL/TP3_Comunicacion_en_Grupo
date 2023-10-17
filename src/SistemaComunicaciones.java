@@ -1,5 +1,7 @@
 import java.io.*;
 import java.net.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class SistemaComunicaciones {
@@ -162,17 +164,21 @@ public class SistemaComunicaciones {
                 // Agrega la conexión al pool de sockets
                 executorService.submit(() -> {
                     // Procesa la conexión
-                    BufferedReader input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                    System.out.println(input.readLine());
-                    PrintWriter output = new PrintWriter(clientSocket.getOutputStream(), true);
+                    BufferedReader input = null;
+                    try {
+                        input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                        System.out.println(input.readLine());
+                    PrintWriter output = null;
+                        output = new PrintWriter(clientSocket.getOutputStream(), true);
                     // Lectura del input del cliente y se lo envia devuelta como output
                     String line;
-                    while ((line = input.readLine()) != null) {
-                        output.println(line);
+                    while (true) {
+                        if (!((line = input.readLine()) != null)) break;
                     }
-
-                    // Cierre del socket cliente
                     clientSocket.close();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 });
             }
         } catch (IOException e) {
