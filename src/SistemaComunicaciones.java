@@ -78,7 +78,7 @@ public class SistemaComunicaciones {
         // Declaracion del nombre del host servidor daytime
         try {
             String host = ipDestino;
-            String port_string = "8080";
+            String port_string = "733";
             Integer port = Integer.parseInt(port_string);
             //crea el socket y se intenta conectar
             so_check_port = new Socket(host, port);
@@ -95,9 +95,10 @@ public class SistemaComunicaciones {
             data_out_socket.println(linea);
             // lee los datos del InputSteeam del socket y
             //los envia a la salida estandar
-            confirmacion = "Enviado";
+            confirmacion = data_in_socket.readLine();
+            //confirmacion = "Enviado";
             //cierra la conexion
-            so_check_port.close();
+            //so_check_port.close();
         } // end try
         catch (UnknownHostException e) {
             // si hubo error lo envia a la salida por defecto
@@ -110,7 +111,7 @@ public class SistemaComunicaciones {
             System.out.println(e);
             confirmacion = "ERROR";
         }
-        return confirmacion;
+       return confirmacion;
     }
 
     public String ReceiveTCP() {
@@ -120,7 +121,7 @@ public class SistemaComunicaciones {
         DataInputStream texto_console;
         String confirmacion;
         try {
-            String portString = "8080";
+            String portString = "733";
             Integer port = Integer.parseInt(portString);
             serverSocket = new ServerSocket(port);
             // while (true) {
@@ -157,7 +158,7 @@ public class SistemaComunicaciones {
         DataInputStream texto_console;
         String confirmacion;
         try {
-            String portString = "8080";
+            String portString = "733";
             Integer port = Integer.parseInt(portString);
             serverSocket = new ServerSocket(port);
 
@@ -173,13 +174,9 @@ public class SistemaComunicaciones {
                     try {
                         input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                         System.out.println(input.readLine());
-                    PrintWriter output = null;
-                        output = new PrintWriter(clientSocket.getOutputStream(), true);
+                        PrintWriter output = new PrintWriter(clientSocket.getOutputStream(), true);
                     // Lectura del input del cliente y se lo envia devuelta como output
-                    String line;
-                    while (true) {
-                        if (!((line = input.readLine()) != null)) break;
-                    }
+                        output.println("RECIBIDO MULTICAST");
                     clientSocket.close();
                     } catch (IOException e) {
                         throw new RuntimeException(e);
