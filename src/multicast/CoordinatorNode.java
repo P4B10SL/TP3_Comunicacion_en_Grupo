@@ -1,28 +1,29 @@
+package multicast;
 import java.net.*;
 import java.io.*;
 
 public class CoordinatorNode {
     public static void main(String[] args) throws Exception {
-        // Create a ServerSocket to receive messages from external sources
+        // Creación del ServerSocket para recibir mensajes de los nodos externos
         try (ServerSocket serverSocket = new ServerSocket(5000)) {
-            // Create a MulticastSocket to send messages to the multicast group
+            // Creación del MulticastSocket para enviar mensajes a los nodos del grupo
             try (MulticastSocket multicastSocket = new MulticastSocket()) {
                 InetAddress groupAddress = InetAddress.getByName("239.255.0.1");
 
                 while (true) {
-                    // Accept a connection from an external source
+                    // Esperar a que un nodo externo se conecte
                     try (Socket socket = serverSocket.accept();
                          DataInputStream in = new DataInputStream(socket.getInputStream())) {
 
-                        // Read the message
+                        // Leer el mensaje del nodo externo
                         String message = in.readUTF();
 
-                        // Forward the message to the multicast group
+                        // Enviar el mensaje a los nodos del grupo
                         byte[] buffer = message.getBytes();
                         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, groupAddress, 5001);
                         multicastSocket.send(packet);
                     }
-                    // 'socket' is closed automatically due to try-with-resources
+                    // Cierre del socket
                 }
             }
         }
