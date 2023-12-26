@@ -2,8 +2,8 @@ import java.net.*;
 
 public class GroupNode {
     public static void main(String[] args) throws Exception {
-        InetAddress groupAddress = InetAddress.getByName("224.0.0.1");
-        NetworkInterface networkInterface = NetworkInterface.getByName("eth0"); // replace with your network interface
+        InetAddress groupAddress = InetAddress.getByName("239.255.0.1");
+        NetworkInterface networkInterface = NetworkInterface.getByName("Radmin VPN"); // replace with your network interface
 
         // Use try-with-resources to ensure the MulticastSocket is closed when it's no longer needed
         try (MulticastSocket multicastSocket = new MulticastSocket(5001)) {

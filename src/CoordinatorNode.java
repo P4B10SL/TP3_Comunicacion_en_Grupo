@@ -7,7 +7,7 @@ public class CoordinatorNode {
         try (ServerSocket serverSocket = new ServerSocket(5000)) {
             // Create a MulticastSocket to send messages to the multicast group
             try (MulticastSocket multicastSocket = new MulticastSocket()) {
-                InetAddress groupAddress = InetAddress.getByName("224.0.0.1");
+                InetAddress groupAddress = InetAddress.getByName("239.255.0.1");
 
                 while (true) {
                     // Accept a connection from an external source
